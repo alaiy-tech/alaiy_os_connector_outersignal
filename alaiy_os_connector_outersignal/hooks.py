@@ -39,3 +39,14 @@ alaiy_os_sidebar_log_items = [
         "icon": "activity",
     }
 ]
+
+# ---------------------------------------------------------------------------
+# Scheduler
+# ---------------------------------------------------------------------------
+# Profiles are kept even when the person is not a Customer yet; this attaches
+# them once the Customer appears.
+scheduler_events = {
+    "hourly": [
+        "alaiy_os_connector_outersignal.outersignal.profile.link_pending_profiles"
+    ]
+}

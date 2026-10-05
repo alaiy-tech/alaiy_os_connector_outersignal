@@ -1,11 +1,11 @@
 # Copyright (c) 2026, Alaiy and contributors
 # For license information, please see license.txt
 """
-The customer-export import, without Frappe: python -m unittest tests.test_csv_import
+The file import's counting, without Frappe: python -m unittest tests.test_csv_import
 
-The rows below are made up. The column names are the ones in the platform's
-export. Matching and storing are replaced by fakes, so this checks the row
-mapping and the counting, not the database.
+The rows are made up and keep only the columns the importer reads. Matching and
+storing are replaced by a fake, so this checks how rows are folded into people and
+how failures are counted, not the database.
 """
 
 import importlib.util
@@ -18,71 +18,28 @@ ROOT = pathlib.Path(__file__).resolve().parents[1] / "outersignal"
 PKG = "alaiy_os_connector_outersignal"
 
 
-def _load(name, filename, **inject):
+def _load(name, filename):
     spec = importlib.util.spec_from_file_location(f"{PKG}.outersignal.{name}", ROOT / filename)
     module = importlib.util.module_from_spec(spec)
-    module.__dict__.update(inject)
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     return module
 
 
-ROW = {
-    "order_name": "#1042", "email": "Jane@Example.com", "order_email": "jane@example.com",
-    "full_name": "Jane Smith", "phone": "+1-555-0100", "age": "34", "gender": "female",
-    "city": "Austin", "state": "TX", "country": "US", "property_value": "412000.00",
-    "job_title_1": "Nurse", "employer_1": "General Hospital", "job_title_2": "", "employer_2": "",
-    "linkedin_url": "https://linkedin.example/jane", "x_url": "", "persona": "The Smart Saver",
-    "shopify_customer_id": "8123456789.0", "customer_order_count": "3", "customer_total_spent": "250.50",
-}
-
-
-class TestRow(unittest.TestCase):
-    def setUp(self):
-        self.parse = _load("parse", "parse.py")
-
-    def test_row_maps_to_the_values_that_are_stored(self):
-        d = self.parse.normalize_csv_row(ROW)
-        self.assertEqual((d["email"], d["order_name"], d["shopify_customer_id"]),
-                         ("jane@example.com", "#1042", "8123456789"))
-        self.assertEqual((d["age"], d["gender"], d["job_title"], d["property_value"], d["state"]),
-                         (34, "female", "Nurse", 412000.0, "TX"))
-        self.assertEqual(d["extra"]["company_name"], "General Hospital")
-        self.assertEqual(d["extra"]["social_profiles"], [{"platform": "linkedin", "url": "https://linkedin.example/jane"}])
-        self.assertEqual(d["extra"]["total_spent"], 250.5)
-        self.assertIsNone(d["researched_at"])
-
-    def test_blank_columns_are_left_out(self):
-        d = self.parse.normalize_csv_row(dict(ROW, age="", job_title_1="", property_value=""))
-        self.assertIsNone(d["age"])
-        self.assertIsNone(d["job_title"])
-        self.assertIsNone(d["property_value"])
-        self.assertNotIn("other_roles", d["extra"])
-
-    def test_the_order_email_is_used_when_the_email_is_blank(self):
-        self.assertEqual(self.parse.normalize_csv_row(dict(ROW, email=""))["email"], "jane@example.com")
-
-
 class TestImportRows(unittest.TestCase):
     def setUp(self):
-        self.stored = []
-        calls = self.calls = []
+        self.processed = []
 
-        def find_customer(email, order_name, shopify_customer_id=None):
-            calls.append(shopify_customer_id or email)
-            if email == "gone@example.com":
-                return None, "no customer found for this order name or email"
-            if email == "shared@example.com":
-                return None, "email matches several customers on email_id"
-            return "CUST-" + email, None
-
-        def apply_profile(customer, data):
-            if customer == "CUST-boom@example.com":
+        def process(data, source):
+            self.processed.append((data["email"] or data["shopify_customer_id"], data["order_name"], source))
+            if data["email"] == "boom@example.com":
                 raise RuntimeError("write failed")
-            self.stored.append(customer)
-            return True
+            if data["email"] == "gone@example.com":
+                return "P-gone", set(), 0
+            return "P-" + data["email"], {"CUST-" + data["email"]}, 1
 
-        profile = types.SimpleNamespace(find_customer=find_customer, apply_profile=apply_profile)
+        profile = types.SimpleNamespace(
+            process=process, profile_key=lambda data: data.get("email") or data.get("shopify_customer_id"))
         frappe = types.ModuleType("frappe")
         frappe.db = types.SimpleNamespace(rollback=lambda: None, commit=lambda: None)
         frappe.log_error = lambda **kwargs: None
@@ -99,19 +56,30 @@ class TestImportRows(unittest.TestCase):
         _load("parse", "parse.py")
         self.module = _load("csv_import", "csv_import.py")
 
-    def rows(self, *emails):
-        return [dict(ROW, email=e, shopify_customer_id="") for e in emails]
+    @staticmethod
+    def row(email, order, shopify_id=""):
+        return {"email": email, "order_name": order, "shopify_customer_id": shopify_id, "age": "30"}
 
-    def test_counts_and_one_customer_on_several_rows_is_handled_once(self):
-        counts = self.module.import_rows(self.rows(
-            "a@example.com", "a@example.com", "gone@example.com", "shared@example.com", "boom@example.com"))
-        self.assertEqual(counts, {"rows": 5, "customers": 4, "updated": 1, "no_match": 1, "ambiguous": 1, "failed": 1})
-        self.assertEqual(self.stored, ["CUST-a@example.com"])
-        self.assertEqual(self.calls.count("a@example.com"), 1)
+    def test_every_row_is_processed_and_a_person_on_several_orders_counts_once(self):
+        counts = self.module.import_rows([
+            self.row("a@example.com", "#1"), self.row("a@example.com", "#2"),
+            self.row("gone@example.com", "#3"), self.row("b@example.com", "#4"),
+        ])
+        self.assertEqual(counts, {"rows": 4, "customers": 3, "orders": 4, "linked": 2, "updated": 3, "failed": 0})
+        self.assertEqual(len(self.processed), 4)
+        self.assertTrue(all(source == "import" for _, _, source in self.processed))
 
-    def test_a_row_with_no_key_is_skipped(self):
+    def test_a_failed_row_is_counted_and_does_not_stop_the_rest(self):
+        counts = self.module.import_rows([self.row("boom@example.com", "#1"), self.row("a@example.com", "#2")])
+        self.assertEqual((counts["failed"], counts["linked"], counts["customers"]), (1, 1, 2))
+
+    def test_a_row_that_identifies_nobody_is_skipped(self):
         counts = self.module.import_rows([{"age": "30"}])
-        self.assertEqual((counts["rows"], counts["customers"]), (1, 0))
+        self.assertEqual((counts["rows"], counts["customers"], len(self.processed)), (1, 0, 0))
+
+    def test_a_person_with_no_email_is_identified_by_the_shopify_id(self):
+        counts = self.module.import_rows([self.row("", "#1", "55"), self.row("", "#2", "55")])
+        self.assertEqual((counts["customers"], counts["orders"]), (1, 2))
 
 
 if __name__ == "__main__":

@@ -58,10 +58,24 @@ action, with this payload template:
 All values arrive as strings; list fields arrive as JSON text. `order.email` is not rendered
 by the platform, so matching uses `profile.email`.
 
+## Import from the platform's customer export
+
+To fill in customers that have not been delivered by the webhook (for example the
+existing customers, since Live Sync fires on a new order), export the customers as
+a CSV from the platform's dashboard, then use **Actions > Import Profiles (CSV)** on
+the settings form.
+
+Each row goes through the same code as a webhook delivery. It is matched by the Shopify
+customer id (when the Customer carries one), then by order name and email; a row that
+matches no Customer, or could belong to several, is skipped and counted. A customer
+that appears on several rows is handled once, and running the same file again changes
+nothing. The totals are written as one `OuterSignal Sync Log` row (type `import`). The
+file holds personal data, so it is deleted as soon as the import has finished.
+
 ## Tests
 
 ```bash
-python -m unittest tests.test_parse   # from the inner app directory, no Frappe needed
+python -m unittest tests.test_parse tests.test_csv_import   # from the inner app directory, no Frappe needed
 ```
 
 The Customer matching and storage (`outersignal/profile.py`) and the endpoint

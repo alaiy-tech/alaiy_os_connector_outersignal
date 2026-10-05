@@ -40,6 +40,36 @@ frappe.ui.form.on("OuterSignal Connector Settings", {
     );
 
     frm.add_custom_button(
+      __("Import Profiles (CSV)"),
+      () => {
+        new frappe.ui.FileUploader({
+          doctype: frm.doctype,
+          docname: frm.docname,
+          folder: "Home/Attachments",
+          make_attachments_public: false,
+          allow_multiple: false,
+          restrictions: { allowed_file_types: [".csv"] },
+          on_success(file_doc) {
+            frappe.call({
+              method: "alaiy_os_connector_outersignal.api.import_csv.start_import",
+              args: { file_url: file_doc.file_url },
+              callback() {
+                frappe.show_alert(
+                  {
+                    message: __("Import queued. The totals appear in OuterSignal Logs when it finishes."),
+                    indicator: "blue",
+                  },
+                  8,
+                );
+              },
+            });
+          },
+        });
+      },
+      __("Actions"),
+    );
+
+    frm.add_custom_button(
       __("Check Setup"),
       () => {
         frappe.call({

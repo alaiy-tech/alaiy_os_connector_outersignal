@@ -24,8 +24,19 @@ FIELD_MAP = {
 }
 
 
-def find_customer(email, order_name):
-    """Return (customer, None) on a single match, else (None, reason)."""
+def find_customer(email, order_name, shopify_customer_id=None):
+    """Return (customer, None) on a single match, else (None, reason).
+
+    The Shopify customer id is the surest key when a row carries one. It is only
+    unique inside one store, so more than one match falls through to the order
+    name and the email like any other row."""
+    if shopify_customer_id and frappe.get_meta("Customer").has_field("sh_shopify_customer_id"):
+        found = frappe.get_all(
+            "Customer", filters={"sh_shopify_customer_id": str(shopify_customer_id)}, pluck="name", limit=2
+        )
+        if len(found) == 1:
+            return found[0], None
+
     if order_name and frappe.get_meta("Sales Order").has_field("sh_shopify_order_name"):
         bare = order_name.lstrip("#")
         rows = frappe.get_all(

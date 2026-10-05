@@ -31,7 +31,7 @@
       "read_only": 1
     },
     {
-      "description": "Paste the same value into the Signing Secret of the webhook action. Deliveries without a matching signature are rejected.",
+      "description": "Created automatically when OuterSignal is enabled. Reveal it here, or use Actions > Generate Secret, and paste the same value into the Signing Secret of the webhook action. Deliveries without a matching signature are rejected.",
       "fieldname": "outersignal_webhook_secret",
       "fieldtype": "Password",
       "label": "Signing Secret"

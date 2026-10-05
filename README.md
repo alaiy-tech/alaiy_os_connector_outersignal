@@ -26,8 +26,8 @@ bench install-app alaiy_os_connector_outersignal
 bench --site <site> migrate
 ```
 
-Open **OuterSignal Connector Settings**, set a Signing Secret, enable it (this creates the
-Customer fields). Use the shown Webhook URL and the same secret in the playbook's webhook
+Open **OuterSignal Connector Settings** and enable it. This creates the Customer fields and a
+Signing Secret (reveal it in the form, or use Actions > Generate Secret for a new one). Use the shown Webhook URL and the same secret in the playbook's webhook
 action, with this payload template:
 
 ```json

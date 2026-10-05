@@ -15,6 +15,31 @@ frappe.ui.form.on("OuterSignal Connector Settings", {
     frm.refresh_field("outersignal_webhook_url");
 
     frm.add_custom_button(
+      __("Generate Secret"),
+      () => {
+        frappe.confirm(
+          __(
+            "This replaces the current secret. Deliveries stop being accepted until the new value is pasted into the webhook action. Continue?",
+          ),
+          () => {
+            frappe.call({
+              method: "alaiy_os_connector_outersignal.api.secret.generate_secret",
+              callback(r) {
+                if (!r.message) return;
+                frappe.msgprint({
+                  title: __("New Signing Secret"),
+                  message: `<p>${__("Copy it now; it is not shown again here.")}</p><p><code style="word-break:break-all">${frappe.utils.escape_html(r.message)}</code></p>`,
+                });
+                frm.reload_doc();
+              },
+            });
+          },
+        );
+      },
+      __("Actions"),
+    );
+
+    frm.add_custom_button(
       __("Check Setup"),
       () => {
         frappe.call({

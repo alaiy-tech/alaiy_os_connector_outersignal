@@ -39,24 +39,25 @@ def receive():
         frappe.local.response["http_status_code"] = 400
         return {"ok": False, "reason": "invalid body"}
 
-    customer, reason = profile.find_customer(data["email"], data["order_name"])
-    if not customer:
-        sync_log.record("skipped", data["order_name"], reason)
-        return {"ok": True, "matched": False}
-
     try:
-        applied = profile.apply_profile(customer, data)
+        # Kept whether or not the person is a Customer here; copied onto every
+        # Customer record they are found under.
+        stored, customers, updated = profile.process(data, "webhook")
     except Exception:
         frappe.db.rollback()
         sync_log.record("failed", data["order_name"], frappe.get_traceback())
         frappe.db.commit()
         raise
 
-    sync_log.record(
-        "success" if applied else "skipped",
-        data["order_name"],
-        None if applied else "a newer profile is already stored",
-        updated=1 if applied else 0,
-    )
+    if not stored:
+        sync_log.record("skipped", data["order_name"], "the delivery has no email or customer id to identify the person")
+    elif not customers:
+        sync_log.record("success", data["order_name"], message=f"order {data['order_name']}: profile kept, no matching customer yet")
+    else:
+        sync_log.record(
+            "success" if updated else "skipped", data["order_name"],
+            None if updated else "a newer profile is already stored",
+            updated=updated,
+        )
     frappe.db.set_single_value(SETTINGS, "outersignal_last_received_at", now_datetime())
-    return {"ok": True, "matched": True, "applied": applied}
+    return {"ok": True, "stored": bool(stored), "customers": len(customers), "updated": updated}

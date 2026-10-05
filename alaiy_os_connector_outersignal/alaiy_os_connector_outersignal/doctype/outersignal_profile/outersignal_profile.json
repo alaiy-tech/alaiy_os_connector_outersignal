@@ -1,0 +1,493 @@
+{
+  "creation": "2026-10-05 00:00:00.000000",
+  "doctype": "DocType",
+  "engine": "InnoDB",
+  "links": [],
+  "modified": "2026-10-05 00:00:00.000000",
+  "modified_by": "Administrator",
+  "module": "Alaiy Os Connector OuterSignal",
+  "name": "OuterSignal Profile",
+  "owner": "Administrator",
+  "states": [],
+  "track_changes": 0,
+  "autoname": "hash",
+  "field_order": [
+    "profile_key",
+    "source",
+    "researched_at",
+    "order_date",
+    "order_name",
+    "order_email",
+    "channel_name",
+    "customer_number_of_orders",
+    "has_vip_alert",
+    "full_name",
+    "email",
+    "phone",
+    "birth_date",
+    "age",
+    "gender",
+    "city",
+    "state",
+    "country",
+    "property_value",
+    "biography",
+    "significant_other_name",
+    "relationship_status",
+    "employer_1",
+    "job_title_1",
+    "employer_2",
+    "job_title_2",
+    "employer_3",
+    "job_title_3",
+    "education_institution",
+    "education_degree",
+    "linkedin_url",
+    "linkedin_followers",
+    "x_url",
+    "x_username",
+    "x_followers",
+    "instagram_url",
+    "instagram_username",
+    "instagram_followers",
+    "facebook_url",
+    "facebook_followers",
+    "youtube_url",
+    "youtube_username",
+    "youtube_subscribers",
+    "tiktok_url",
+    "tiktok_username",
+    "tiktok_followers",
+    "threads_url",
+    "threads_username",
+    "threads_followers",
+    "user_tags",
+    "integration_tags",
+    "system_tags",
+    "customer_order_count",
+    "customer_total_spent",
+    "customer_avg_order",
+    "customer_since",
+    "persona",
+    "shopify_customer_id",
+    "products_purchased",
+    "lists",
+    "social_profiles",
+    "sb_orders",
+    "orders",
+    "sb_customers",
+    "customers"
+  ],
+  "fields": [
+    {
+      "fieldname": "profile_key",
+      "fieldtype": "Data",
+      "label": "Profile Key",
+      "unique": 1,
+      "reqd": 1,
+      "read_only": 1,
+      "description": "The email, or the Shopify customer id when there is no email. One record per person."
+    },
+    {
+      "fieldname": "source",
+      "fieldtype": "Select",
+      "label": "Source",
+      "options": "webhook\nimport",
+      "read_only": 1
+    },
+    {
+      "fieldname": "researched_at",
+      "fieldtype": "Datetime",
+      "label": "Researched At",
+      "read_only": 1
+    },
+    {
+      "fieldname": "order_date",
+      "fieldtype": "Small Text",
+      "label": "Order Date",
+      "read_only": 1
+    },
+    {
+      "fieldname": "order_name",
+      "fieldtype": "Data",
+      "label": "Order Name",
+      "read_only": 1,
+      "search_index": 1
+    },
+    {
+      "fieldname": "order_email",
+      "fieldtype": "Small Text",
+      "label": "Order Email",
+      "read_only": 1
+    },
+    {
+      "fieldname": "channel_name",
+      "fieldtype": "Small Text",
+      "label": "Channel Name",
+      "read_only": 1
+    },
+    {
+      "fieldname": "customer_number_of_orders",
+      "fieldtype": "Int",
+      "label": "Customer Number Of Orders",
+      "read_only": 1
+    },
+    {
+      "fieldname": "has_vip_alert",
+      "fieldtype": "Check",
+      "label": "Has VIP Alert",
+      "read_only": 1
+    },
+    {
+      "fieldname": "full_name",
+      "fieldtype": "Small Text",
+      "label": "Full Name",
+      "read_only": 1
+    },
+    {
+      "fieldname": "email",
+      "fieldtype": "Data",
+      "label": "Email",
+      "read_only": 1,
+      "search_index": 1
+    },
+    {
+      "fieldname": "phone",
+      "fieldtype": "Small Text",
+      "label": "Phone",
+      "read_only": 1
+    },
+    {
+      "fieldname": "birth_date",
+      "fieldtype": "Small Text",
+      "label": "Birth Date",
+      "read_only": 1
+    },
+    {
+      "fieldname": "age",
+      "fieldtype": "Int",
+      "label": "Age",
+      "read_only": 1
+    },
+    {
+      "fieldname": "gender",
+      "fieldtype": "Small Text",
+      "label": "Gender",
+      "read_only": 1
+    },
+    {
+      "fieldname": "city",
+      "fieldtype": "Small Text",
+      "label": "City",
+      "read_only": 1
+    },
+    {
+      "fieldname": "state",
+      "fieldtype": "Small Text",
+      "label": "State",
+      "read_only": 1
+    },
+    {
+      "fieldname": "country",
+      "fieldtype": "Small Text",
+      "label": "Country",
+      "read_only": 1
+    },
+    {
+      "fieldname": "property_value",
+      "fieldtype": "Float",
+      "label": "Property Value",
+      "read_only": 1
+    },
+    {
+      "fieldname": "biography",
+      "fieldtype": "Small Text",
+      "label": "Biography",
+      "read_only": 1
+    },
+    {
+      "fieldname": "significant_other_name",
+      "fieldtype": "Small Text",
+      "label": "Significant Other Name",
+      "read_only": 1
+    },
+    {
+      "fieldname": "relationship_status",
+      "fieldtype": "Small Text",
+      "label": "Relationship Status",
+      "read_only": 1
+    },
+    {
+      "fieldname": "employer_1",
+      "fieldtype": "Small Text",
+      "label": "Employer 1",
+      "read_only": 1
+    },
+    {
+      "fieldname": "job_title_1",
+      "fieldtype": "Small Text",
+      "label": "Job Title 1",
+      "read_only": 1
+    },
+    {
+      "fieldname": "employer_2",
+      "fieldtype": "Small Text",
+      "label": "Employer 2",
+      "read_only": 1
+    },
+    {
+      "fieldname": "job_title_2",
+      "fieldtype": "Small Text",
+      "label": "Job Title 2",
+      "read_only": 1
+    },
+    {
+      "fieldname": "employer_3",
+      "fieldtype": "Small Text",
+      "label": "Employer 3",
+      "read_only": 1
+    },
+    {
+      "fieldname": "job_title_3",
+      "fieldtype": "Small Text",
+      "label": "Job Title 3",
+      "read_only": 1
+    },
+    {
+      "fieldname": "education_institution",
+      "fieldtype": "Small Text",
+      "label": "Education Institution",
+      "read_only": 1
+    },
+    {
+      "fieldname": "education_degree",
+      "fieldtype": "Small Text",
+      "label": "Education Degree",
+      "read_only": 1
+    },
+    {
+      "fieldname": "linkedin_url",
+      "fieldtype": "Small Text",
+      "label": "LinkedIn URL",
+      "read_only": 1
+    },
+    {
+      "fieldname": "linkedin_followers",
+      "fieldtype": "Int",
+      "label": "LinkedIn Followers",
+      "read_only": 1
+    },
+    {
+      "fieldname": "x_url",
+      "fieldtype": "Small Text",
+      "label": "X URL",
+      "read_only": 1
+    },
+    {
+      "fieldname": "x_username",
+      "fieldtype": "Small Text",
+      "label": "X Username",
+      "read_only": 1
+    },
+    {
+      "fieldname": "x_followers",
+      "fieldtype": "Int",
+      "label": "X Followers",
+      "read_only": 1
+    },
+    {
+      "fieldname": "instagram_url",
+      "fieldtype": "Small Text",
+      "label": "Instagram URL",
+      "read_only": 1
+    },
+    {
+      "fieldname": "instagram_username",
+      "fieldtype": "Small Text",
+      "label": "Instagram Username",
+      "read_only": 1
+    },
+    {
+      "fieldname": "instagram_followers",
+      "fieldtype": "Int",
+      "label": "Instagram Followers",
+      "read_only": 1
+    },
+    {
+      "fieldname": "facebook_url",
+      "fieldtype": "Small Text",
+      "label": "Facebook URL",
+      "read_only": 1
+    },
+    {
+      "fieldname": "facebook_followers",
+      "fieldtype": "Int",
+      "label": "Facebook Followers",
+      "read_only": 1
+    },
+    {
+      "fieldname": "youtube_url",
+      "fieldtype": "Small Text",
+      "label": "YouTube URL",
+      "read_only": 1
+    },
+    {
+      "fieldname": "youtube_username",
+      "fieldtype": "Small Text",
+      "label": "YouTube Username",
+      "read_only": 1
+    },
+    {
+      "fieldname": "youtube_subscribers",
+      "fieldtype": "Int",
+      "label": "YouTube Subscribers",
+      "read_only": 1
+    },
+    {
+      "fieldname": "tiktok_url",
+      "fieldtype": "Small Text",
+      "label": "TikTok URL",
+      "read_only": 1
+    },
+    {
+      "fieldname": "tiktok_username",
+      "fieldtype": "Small Text",
+      "label": "TikTok Username",
+      "read_only": 1
+    },
+    {
+      "fieldname": "tiktok_followers",
+      "fieldtype": "Int",
+      "label": "TikTok Followers",
+      "read_only": 1
+    },
+    {
+      "fieldname": "threads_url",
+      "fieldtype": "Small Text",
+      "label": "Threads URL",
+      "read_only": 1
+    },
+    {
+      "fieldname": "threads_username",
+      "fieldtype": "Small Text",
+      "label": "Threads Username",
+      "read_only": 1
+    },
+    {
+      "fieldname": "threads_followers",
+      "fieldtype": "Int",
+      "label": "Threads Followers",
+      "read_only": 1
+    },
+    {
+      "fieldname": "user_tags",
+      "fieldtype": "Small Text",
+      "label": "User Tags",
+      "read_only": 1
+    },
+    {
+      "fieldname": "integration_tags",
+      "fieldtype": "Small Text",
+      "label": "Integration Tags",
+      "read_only": 1
+    },
+    {
+      "fieldname": "system_tags",
+      "fieldtype": "Small Text",
+      "label": "System Tags",
+      "read_only": 1
+    },
+    {
+      "fieldname": "customer_order_count",
+      "fieldtype": "Int",
+      "label": "Customer Order Count",
+      "read_only": 1
+    },
+    {
+      "fieldname": "customer_total_spent",
+      "fieldtype": "Float",
+      "label": "Customer Total Spent",
+      "read_only": 1
+    },
+    {
+      "fieldname": "customer_avg_order",
+      "fieldtype": "Float",
+      "label": "Customer Avg Order",
+      "read_only": 1
+    },
+    {
+      "fieldname": "customer_since",
+      "fieldtype": "Small Text",
+      "label": "Customer Since",
+      "read_only": 1
+    },
+    {
+      "fieldname": "persona",
+      "fieldtype": "Small Text",
+      "label": "Persona",
+      "read_only": 1
+    },
+    {
+      "fieldname": "shopify_customer_id",
+      "fieldtype": "Data",
+      "label": "Shopify Customer ID",
+      "read_only": 1,
+      "search_index": 1
+    },
+    {
+      "fieldname": "products_purchased",
+      "fieldtype": "Long Text",
+      "label": "Products Purchased",
+      "read_only": 1
+    },
+    {
+      "fieldname": "lists",
+      "fieldtype": "Small Text",
+      "label": "Lists",
+      "read_only": 1
+    },
+    {
+      "fieldname": "social_profiles",
+      "fieldtype": "Small Text",
+      "label": "Social Profiles",
+      "read_only": 1
+    },
+    {
+      "fieldname": "sb_orders",
+      "fieldtype": "Section Break",
+      "label": "Orders"
+    },
+    {
+      "fieldname": "orders",
+      "fieldtype": "Table",
+      "label": "Orders",
+      "options": "OuterSignal Profile Order",
+      "read_only": 1
+    },
+    {
+      "fieldname": "sb_customers",
+      "fieldtype": "Section Break",
+      "label": "Customers"
+    },
+    {
+      "fieldname": "customers",
+      "fieldtype": "Table",
+      "label": "Customers",
+      "options": "OuterSignal Profile Customer",
+      "read_only": 1,
+      "description": "Every Customer this person was found under. Empty until they are found."
+    }
+  ],
+  "permissions": [
+    {
+      "create": 1,
+      "delete": 1,
+      "read": 1,
+      "report": 1,
+      "role": "System Manager",
+      "write": 1
+    }
+  ],
+  "sort_field": "modified",
+  "sort_order": "DESC"
+}

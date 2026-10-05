@@ -3,9 +3,9 @@
 """
 Load the platform's customer export (a CSV file) onto the Customers.
 
-Each row goes through the same match-and-store code as a webhook delivery, so a
-row that matches no Customer is skipped, a row that could belong to several is
-left alone, and running the same file twice changes nothing. The file holds
+Each row goes through the same code as a webhook delivery: it is kept as a profile
+record whether or not the person is a Customer here, and copied onto the Customer
+when exactly one matches. Running the same file twice changes nothing. The file holds
 personal data, so it is deleted as soon as the import has finished.
 """
 
@@ -21,33 +21,34 @@ _COMMIT_EVERY = 200
 
 
 def import_rows(rows):
-    """Apply the rows; returns the counts. One customer appears on several rows
-    when they placed several orders, and is handled once."""
-    counts = {"rows": 0, "customers": 0, "updated": 0, "no_match": 0, "ambiguous": 0, "failed": 0}
-    seen = set()
+    """Keep every row as a profile record and copy it onto every Customer the person
+    is found under. One person appears on several rows when they placed several orders:
+    each row adds its order to the same profile and fills in what the others lacked."""
+    counts = {"rows": 0, "customers": 0, "orders": 0, "linked": 0, "updated": 0, "failed": 0}
+    people = set()
+    linked = set()
     for row in rows:
         counts["rows"] += 1
         data = normalize_csv_row(row)
-        key = data["shopify_customer_id"] or data["email"] or data["order_name"]
-        if not key or key in seen:
+        key = profile.profile_key(data)
+        if not key:
             continue
-        seen.add(key)
-        counts["customers"] += 1
-
-        customer, reason = profile.find_customer(data["email"], data["order_name"], data["shopify_customer_id"])
-        if not customer:
-            counts["ambiguous" if reason and "several" in reason else "no_match"] += 1
-            continue
+        people.add(key)
         try:
-            if profile.apply_profile(customer, data):
-                counts["updated"] += 1
+            name, customers, updated = profile.process(data, "import")
+            counts["orders"] += 1 if data["order_name"] else 0
+            if customers:
+                linked.add(key)
+            counts["updated"] += updated
         except Exception:
             frappe.db.rollback()
             counts["failed"] += 1
             frappe.log_error(title="OuterSignal import: a row could not be stored", message=frappe.get_traceback())
-        if counts["customers"] % _COMMIT_EVERY == 0:
+        if counts["rows"] % _COMMIT_EVERY == 0:
             frappe.db.commit()
     frappe.db.commit()
+    counts["customers"] = len(people)
+    counts["linked"] = len(linked)
     return counts
 
 

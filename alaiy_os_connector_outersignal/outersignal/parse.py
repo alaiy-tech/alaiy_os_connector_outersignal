@@ -110,3 +110,63 @@ def normalize(payload):
         "country": _clean(profile.get("country")),
         "extra": {k: v for k, v in extra.items() if v is not None},
     }
+
+
+_SOCIAL_NETWORKS = ("linkedin", "x", "instagram", "facebook", "youtube", "tiktok", "threads")
+
+
+def _shopify_id(value):
+    value = _clean(value)
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text[:-2] if text.endswith(".0") else text
+
+
+def normalize_csv_row(row):
+    """One row of the platform's customer export, in the shape normalize()
+    returns plus the Shopify customer id the row carries. The export has no
+    research date, so researched_at is None and never blocks a later webhook."""
+    def get(key):
+        return _clean(row.get(key))
+
+    age = _number(get("age"))
+    socials = [
+        {"platform": network, "url": get(f"{network}_url")}
+        for network in _SOCIAL_NETWORKS if get(f"{network}_url")
+    ]
+    other_roles = [
+        {"title": get(f"job_title_{i}"), "employer": get(f"employer_{i}")}
+        for i in (2, 3) if get(f"job_title_{i}") or get(f"employer_{i}")
+    ]
+    extra = {
+        "name": get("full_name"),
+        "phone": get("phone"),
+        "birth_date": get("birth_date"),
+        "relationship_status": get("relationship_status"),
+        "biography": get("biography"),
+        "company_name": get("employer_1"),
+        "other_roles": other_roles or None,
+        "education_institution": get("education_institution"),
+        "education_degree": get("education_degree"),
+        "social_profiles": socials or None,
+        "order_count": _number(get("customer_order_count")),
+        "total_spent": _number(get("customer_total_spent")),
+        "avg_value": _number(get("customer_avg_order")),
+        "customer_since": get("customer_since"),
+    }
+    return {
+        "email": (get("email") or get("order_email") or "").lower(),
+        "order_name": get("order_name"),
+        "shopify_customer_id": _shopify_id(row.get("shopify_customer_id")),
+        "researched_at": None,
+        "age": int(round(age)) if age is not None else None,
+        "gender": get("gender"),
+        "persona": get("persona"),
+        "job_title": get("job_title_1"),
+        "property_value": _number(get("property_value")),
+        "city": get("city"),
+        "state": get("state"),
+        "country": get("country"),
+        "extra": {k: v for k, v in extra.items() if v is not None},
+    }

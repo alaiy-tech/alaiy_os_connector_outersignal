@@ -1,9 +1,11 @@
 const OUTERSIGNAL_SYNC_TYPE_COLORS = {
 	webhook: "cyan",
+	import: "orange",
 };
 
 const OUTERSIGNAL_TRIGGER_COLORS = {
 	webhook: "cyan",
+	manual: "pink",
 };
 
 const OUTERSIGNAL_STATUS_COLORS = {

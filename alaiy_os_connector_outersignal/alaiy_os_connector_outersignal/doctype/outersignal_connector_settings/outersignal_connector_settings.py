@@ -1,6 +1,8 @@
 # Copyright (c) 2026, Alaiy and contributors
 # For license information, please see license.txt
 
+import secrets
+
 import frappe
 from frappe.model.document import Document
 
@@ -14,7 +16,18 @@ class OuterSignalConnectorSettings(Document):
             "OuterSignal Connector Settings", "is_enabled"
         ) or 0
         self.flags.outersignal_just_enabled = bool(self.is_enabled and not old_enabled)
+        self._ensure_secret()
         self._sync_registry_is_enabled()
+
+    def _ensure_secret(self):
+        # The receiver rejects every delivery without a secret, so enabling with
+        # none set creates one. A typed or already stored value is left alone.
+        if (
+            self.is_enabled
+            and not self.outersignal_webhook_secret
+            and not self.get_password("outersignal_webhook_secret", raise_exception=False)
+        ):
+            self.outersignal_webhook_secret = secrets.token_hex(32)
 
     def on_update(self):
         if self.flags.outersignal_just_enabled:

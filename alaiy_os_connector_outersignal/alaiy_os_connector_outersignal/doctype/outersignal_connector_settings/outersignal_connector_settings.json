@@ -1,0 +1,71 @@
+{
+  "creation": "2026-10-05 00:00:00.000000",
+  "docstatus": 0,
+  "doctype": "DocType",
+  "editable_grid": 1,
+  "engine": "InnoDB",
+  "field_order": [
+    "is_enabled",
+    "sb_webhook",
+    "outersignal_webhook_url",
+    "outersignal_webhook_secret",
+    "outersignal_last_received_at"
+  ],
+  "fields": [
+    {
+      "default": "0",
+      "fieldname": "is_enabled",
+      "fieldtype": "Check",
+      "label": "Enable OuterSignal"
+    },
+    {
+      "fieldname": "sb_webhook",
+      "fieldtype": "Section Break",
+      "label": "Webhook Receiver"
+    },
+    {
+      "description": "Paste this into the webhook action of the playbook.",
+      "fieldname": "outersignal_webhook_url",
+      "fieldtype": "Data",
+      "label": "Webhook URL",
+      "read_only": 1
+    },
+    {
+      "description": "Paste the same value into the Signing Secret of the webhook action. Deliveries without a matching signature are rejected.",
+      "fieldname": "outersignal_webhook_secret",
+      "fieldtype": "Password",
+      "label": "Signing Secret"
+    },
+    {
+      "fieldname": "outersignal_last_received_at",
+      "fieldtype": "Datetime",
+      "label": "Last Delivery Received",
+      "read_only": 1
+    }
+  ],
+  "is_single": 1,
+  "links": [],
+  "modified": "2026-10-05 00:00:00.000000",
+  "modified_by": "Administrator",
+  "module": "Alaiy Os Connector OuterSignal",
+  "name": "OuterSignal Connector Settings",
+  "owner": "Administrator",
+  "permissions": [
+    {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "export": 1,
+      "print": 1,
+      "read": 1,
+      "report": 1,
+      "role": "System Manager",
+      "share": 1,
+      "write": 1
+    }
+  ],
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "states": [],
+  "track_changes": 0
+}
